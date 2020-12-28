@@ -1,4 +1,13 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  UsePipes,
+} from '@nestjs/common';
+import { ValidationPipe } from 'src/shared/validation.pipe';
 import { QuoteDTO } from './quote.dto';
 import { QuotesService } from './quotes.service';
 
@@ -21,6 +30,7 @@ export class QuotesController {
   }
 
   @Post()
+  @UsePipes(new ValidationPipe())
   createQuote(@Body() data: QuoteDTO) {
     return this.quotesService.create(data);
   }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { QuoteDTO } from './quote.dto';
@@ -18,7 +18,11 @@ export class QuotesService {
 
   async readOne(id: string): Promise<QuoteDTO> {
     const quote = await this.quoteRepository.findOne({ where: { id } });
-    return quote;
+    if (!quote) {
+      throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+    } else {
+      return quote;
+    }
   }
 
   async readOneCompany(companyName: string): Promise<QuoteDTO[]> {
@@ -36,7 +40,11 @@ export class QuotesService {
 
   async delete(id: string): Promise<QuoteDTO> {
     const quote = await this.quoteRepository.findOne({ where: { id } });
-    await this.quoteRepository.delete({ id });
-    return quote;
+    if (!quote) {
+      throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+    } else {
+      await this.quoteRepository.delete({ id });
+      return quote;
+    }
   }
 }
