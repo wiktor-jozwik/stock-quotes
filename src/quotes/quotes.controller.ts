@@ -1,20 +1,32 @@
-import { Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { QuoteDTO } from './quote.dto';
+import { QuotesService } from './quotes.service';
 
 @Controller('quotes')
 export class QuotesController {
-  // constructor
+  constructor(private quotesService: QuotesService) {}
   @Get()
-  showAllQuotes() {}
+  showAllQuotes() {
+    return this.quotesService.showAll();
+  }
 
   @Get(':id')
-  readSingleQuote(@Param('id') id: string) {}
+  readSingleQuote(@Param('id') id) {
+    return this.quotesService.readOne(id);
+  }
 
-  @Get(':name')
-  readStockQuotes(@Param(':name') name: string) {}
+  @Get('company/:name')
+  readCompanyQuotes(@Param('name') name: string) {
+    return this.quotesService.readOneCompany(name);
+  }
 
   @Post()
-  createQuote() {}
+  createQuote(@Body() data: QuoteDTO) {
+    return this.quotesService.create(data);
+  }
 
   @Delete(':id')
-  deleteQuote(@Param('id') id: string) {}
+  deleteQuote(@Param('id') id: string) {
+    return this.quotesService.delete(id);
+  }
 }
