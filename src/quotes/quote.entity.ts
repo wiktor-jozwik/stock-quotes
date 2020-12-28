@@ -9,15 +9,15 @@ import {
 export class QuoteEntity {
   @PrimaryGeneratedColumn('uuid') id: string;
 
-  @CreateDateColumn() created: Date;
+  @CreateDateColumn({ type: 'timestamp with time zone' }) created: Date;
 
   @Column('text') name: string;
 
-  @Column('number') open: number;
+  @Column('float') open: number;
 
-  @Column('number') high: number;
+  @Column('float') high: number;
 
-  @Column('number') low: number;
+  @Column('float') low: number;
 
-  @Column('number') close: number;
+  @Column('float') close: number;
 }
