@@ -1,23 +1,14 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { CompanyEntity } from 'src/companies/company.entity';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('quote')
 export class QuoteEntity {
   @PrimaryGeneratedColumn('uuid') id: string;
 
-  @CreateDateColumn({ type: 'timestamp with time zone' }) created: Date;
+  @Column('text') date: string;
 
-  @Column('text') name: string;
+  @Column('money') value: number;
 
-  @Column('float') open: number;
-
-  @Column('float') high: number;
-
-  @Column('float') low: number;
-
-  @Column('float') close: number;
+  @ManyToOne((type) => CompanyEntity, (company) => company.quotes)
+  company: CompanyEntity;
 }
