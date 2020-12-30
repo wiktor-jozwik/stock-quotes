@@ -24,11 +24,6 @@ export class QuotesController {
     return this.quotesService.readOne(id);
   }
 
-  @Get('company/:name')
-  readCompanyQuotes(@Param('name') name: string) {
-    return this.quotesService.readOneCompany(name);
-  }
-
   @Post()
   @UsePipes(new ValidationPipe())
   createQuote(@Body() data: QuoteDTO) {
