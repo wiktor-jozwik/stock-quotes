@@ -19,29 +19,25 @@ export class QuotesService {
     return quotes.map((quote) => quote.toResponseQuote());
   }
 
-  async readOne(id: string): Promise<QuoteRO> {
+  async show(id: string): Promise<QuoteRO> {
     const quote = await this.quoteRepository.findOne({
       where: { id },
       relations: ['company'],
     });
     if (!quote) {
-      throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+      throw new HttpException('Quote not found', HttpStatus.NOT_FOUND);
     } else {
       return quote.toResponseQuote();
     }
   }
 
-  // async readOneCompany(companyName: string): Promise<QuoteDTO[]> {
-  //   const quotes = await this.quoteRepository.find({
-  //     where: { name: companyName },
-  //   });
-  //   return quotes;
-  // }
-
   async create(data: QuoteDTO): Promise<QuoteDTO> {
     const company = await this.companyRepository.findOne({
       where: { id: data.companyId },
     });
+    if (!company) {
+      throw new HttpException('Company not found', HttpStatus.NOT_FOUND);
+    }
     const quote = await this.quoteRepository.create({ ...data, company });
     await this.quoteRepository.save(quote);
     return quote;
@@ -50,7 +46,7 @@ export class QuotesService {
   async delete(id: string): Promise<QuoteDTO> {
     const quote = await this.quoteRepository.findOne({ where: { id } });
     if (!quote) {
-      throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+      throw new HttpException('Quote not found', HttpStatus.NOT_FOUND);
     } else {
       await this.quoteRepository.delete({ id });
       return quote;

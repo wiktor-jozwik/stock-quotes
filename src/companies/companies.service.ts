@@ -23,17 +23,44 @@ export class CompaniesService {
     const companies = await this.companyRepository.find({
       relations: ['quotes'],
     });
+    console.log(companies);
     return companies.map((company) => this.toResponseCompany(company));
   }
 
-  async createCompany(data: CompanyDTO): Promise<CompanyRO> {
+  async show(symbol: string): Promise<CompanyRO> {
+    const company = await this.companyRepository.findOne({
+      where: { symbol: symbol },
+      relations: ['quotes'],
+    });
+    if (!company) {
+      throw new HttpException('Company not found', HttpStatus.NOT_FOUND);
+    }
+    return this.toResponseCompany(company);
+  }
+
+  async create(data: CompanyDTO): Promise<CompanyRO> {
     const { symbol } = data;
-    let company = await this.companyRepository.findOne({ where: { symbol } });
+    let company = await this.companyRepository.findOne({
+      where: { symbol },
+    });
     if (company) {
-      throw new HttpException('Company alreade exists', HttpStatus.BAD_REQUEST);
+      throw new HttpException('Company already exists', HttpStatus.BAD_REQUEST);
     }
     company = await this.companyRepository.create(data);
     await this.companyRepository.save(company);
     return this.toResponseCompany(company);
+  }
+
+  async update(id: string, data: Partial<CompanyDTO>): Promise<CompanyRO> {
+    let company = await this.companyRepository.findOne({ where: { id } });
+    if (!company) {
+      throw new HttpException('Company not found', HttpStatus.NOT_FOUND);
+    }
+    await this.companyRepository.update({ id }, data);
+    company = await this.companyRepository.findOne({
+      where: { id },
+      relations: ['quotes'],
+    });
+    return company;
   }
 }
