@@ -23,7 +23,6 @@ export class CompaniesService {
     const companies = await this.companyRepository.find({
       relations: ['quotes'],
     });
-    console.log(companies);
     return companies.map((company) => this.toResponseCompany(company));
   }
 
