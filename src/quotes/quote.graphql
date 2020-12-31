@@ -1,0 +1,10 @@
+type Quote {
+  id: ID!
+  date: String!
+  value: Float!
+  company: Company!
+}
+
+type Query {
+  quotes: [Quote!]
+}

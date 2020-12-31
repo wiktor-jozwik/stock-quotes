@@ -1,23 +1,23 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { CompanyEntity } from 'src/companies/company.entity';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { QuoteRO } from './quote.dto';
 
 @Entity('quote')
 export class QuoteEntity {
   @PrimaryGeneratedColumn('uuid') id: string;
 
-  @CreateDateColumn({ type: 'timestamp with time zone' }) created: Date;
+  @Column('uuid') companyId: string;
 
-  @Column('text') name: string;
+  @Column('text') date: string;
 
-  @Column('float') open: number;
+  @Column('decimal') value: number;
 
-  @Column('float') high: number;
+  @ManyToOne((type) => CompanyEntity, (company) => company.quotes)
+  company: CompanyEntity;
 
-  @Column('float') low: number;
-
-  @Column('float') close: number;
+  toResponseQuote(): QuoteRO {
+    const { id, companyId, date, value, company } = this;
+    const responseObject: QuoteRO = { id, date, value, company };
+    return responseObject;
+  }
 }

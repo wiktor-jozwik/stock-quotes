@@ -1,0 +1,10 @@
+type Company {
+  id: ID!
+  name: String!
+  symbol: String!
+  quotes: [Quote!]
+}
+
+type Query {
+  companies: [Company!]
+}

@@ -21,12 +21,7 @@ export class QuotesController {
 
   @Get(':id')
   readSingleQuote(@Param('id') id) {
-    return this.quotesService.readOne(id);
-  }
-
-  @Get('company/:name')
-  readCompanyQuotes(@Param('name') name: string) {
-    return this.quotesService.readOneCompany(name);
+    return this.quotesService.show(id);
   }
 
   @Post()
