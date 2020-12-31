@@ -47,35 +47,76 @@ App is connected to Postgre database with TypeORM, configuration is in file ormc
 
 Default path to server: 
 ```
-localhost:3000/quotes
+localhost:3000
 ```
 ### Database
 Quote:
   ```ts
-  ID: uuid
-  Created: Date
-  Name: string
-  Open: number
-  High: number
-  Low: number
-  Close: number
+  id: uuid
+  companyId: uuid
+  date: string
+  value: number
 ```
+Company:
+  ```ts
+  id: uuid
+  name: string
+  symbol: string
+  ```
+
 
 ### Available requests
 * GET
-  * getting quote by ID - after default path insert /{id} i.e.
+  * getting quote by ID - after default path insert /quotes/{id} i.e.
   ```
   localhost:3000/quotes/c3a88fb3-e997-4269-b0d5-5617f2fdcd91
   ```
-  * getting all quotes of company - after default path insert /company/{name} i.e.
+  * getting company by name, after default path: /companies/{symbol}
   ```
-  localhost:3000/quotes/company/IBM
+  localhost:3000/companies/AAPL
   ```
 * POST
-  * provide all properties of quote entity(without ID and created date) in body and send to app on default path
+  * post company:
+    * provide name and symbol and post on default path + /company
+  * post quote:
+    * provide companyId, date and value and post on default path + /quotes
+* PUT
+  * provide body with fields to be changed and request on path like that, after default path insert /company/{id}
+  ```
+  localhost:3000/companies/c3a88fb3-e997-4269-b0d5-5617f2fdcd91
+  ```
+
 * DELETE
   * provide ID of quote which have to be deleted in the same way as getting quote by ID
 
-  
-App will be receiving data from some Stock API
- 
+### GraphQL
+```
+localhost:3000/graphql
+```
+* Query for companies
+  ```graphql
+  {
+    companies{
+      id
+      name
+      symbol
+      quotes{
+        id
+        date
+        value
+      }
+    }
+  }
+  ```
+* Query for quotes
+  ```graphql
+    {
+        quotes{
+          id
+          date
+          value
+        }
+    }
+    ```
+
+It's possible to ommit some fields and get data which is needed 
