@@ -17,22 +17,22 @@ export class CompaniesService {
     private connection: Connection,
   ) {}
 
-  private toResponseCompany(company: CompanyEntity): CompanyRO {
-    const { id, name, symbol } = company;
-    if (company.quotes) {
-      const quotes = company.quotes.map((quote) => quote.toResponseQuote());
-      const toResponseObject = { id, name, symbol, quotes: quotes };
-      return toResponseObject;
-    } else {
-      return company;
-    }
-  }
+  // private toResponseCompany(company: CompanyEntity): CompanyRO {
+  //   const { id, name, symbol } = company;
+  //   if (company.quotes) {
+  //     const quotes = company.quotes.map((quote) => quote.toResponseQuote());
+  //     const toResponseObject = { id, name, symbol, quotes: quotes };
+  //     return toResponseObject;
+  //   } else {
+  //     return company;
+  //   }
+  // }
 
   async showAll(): Promise<CompanyRO[]> {
     const companies = await this.companyRepository.find({
       relations: ['quotes'],
     });
-    return companies.map((company) => this.toResponseCompany(company));
+    return companies.map((company) => company.toResponseCompany());
   }
 
   async show(symbol: string): Promise<CompanyRO> {
@@ -43,7 +43,7 @@ export class CompaniesService {
     if (!company) {
       throw new HttpException('Company not found', HttpStatus.NOT_FOUND);
     }
-    return this.toResponseCompany(company);
+    return company.toResponseCompany();
   }
 
   async create(data: CompanyDTO): Promise<CompanyRO> {
@@ -56,7 +56,7 @@ export class CompaniesService {
     }
     company = this.companyRepository.create(data);
     await this.companyRepository.save(company);
-    return this.toResponseCompany(company);
+    return company.toResponseCompany();
   }
 
   async update(symbol: string, data: Partial<CompanyDTO>): Promise<CompanyRO> {
@@ -106,6 +106,6 @@ export class CompaniesService {
     } finally {
       await queryRunner.release();
     }
-    return this.toResponseCompany(company);
+    return company.toResponseCompany();
   }
 }

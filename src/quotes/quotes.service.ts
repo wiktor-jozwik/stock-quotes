@@ -20,6 +20,12 @@ export class QuotesService {
     private connection: Connection,
   ) {}
 
+  // public toResponseQuote(quote: QuoteEntity): QuoteRO {
+  //   const { id, date, value, company } = quote;
+  //   const responseObject: QuoteRO = { id, date, value, company };
+  //   return responseObject;
+  // }
+
   async showAll(): Promise<QuoteRO[]> {
     const queryRunner = this.connection.createQueryRunner();
 
