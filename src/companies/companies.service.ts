@@ -1,7 +1,11 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { QuoteEntity } from 'src/quotes/quote.entity';
-import { Repository } from 'typeorm';
+import { Connection, Repository } from 'typeorm';
 import { CompanyDTO, CompanyRO } from './company.dto';
 import { CompanyEntity } from './company.entity';
 
@@ -10,6 +14,7 @@ export class CompaniesService {
   constructor(
     @InjectRepository(CompanyEntity)
     private companyRepository: Repository<CompanyEntity>,
+    private connection: Connection,
   ) {}
 
   private toResponseCompany(company: CompanyEntity): CompanyRO {
@@ -51,15 +56,27 @@ export class CompaniesService {
   }
 
   async update(id: string, data: Partial<CompanyDTO>): Promise<CompanyRO> {
+    const queryRunner = this.connection.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction('SERIALIZABLE');
     let company = await this.companyRepository.findOne({ where: { id } });
     if (!company) {
       throw new HttpException('Company not found', HttpStatus.NOT_FOUND);
     }
-    await this.companyRepository.update({ id }, data);
-    company = await this.companyRepository.findOne({
-      where: { id },
-      relations: ['quotes'],
-    });
+    try {
+      await this.companyRepository.update({ id }, data);
+      company = await this.companyRepository.findOne({
+        where: { id },
+        relations: ['quotes'],
+      });
+      queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new InternalServerErrorException();
+    } finally {
+      await queryRunner.release();
+    }
     return company;
   }
 }
