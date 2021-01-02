@@ -9,6 +9,7 @@ import {
 import { QuoteRO } from './quote.dto';
 
 @Entity('quote')
+@Index(['date', 'value'])
 export class QuoteEntity {
   @PrimaryGeneratedColumn('uuid') id: string;
 
