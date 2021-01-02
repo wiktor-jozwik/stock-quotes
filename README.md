@@ -63,6 +63,8 @@ Company:
   name: string
   symbol: string
   ```
+  
+ ![alt text](https://github.com/wiktor-jozwik/stock-quotes/blob/develop/StockQuotes.png?raw=true)
 
 
 ### Available requests
