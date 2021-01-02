@@ -21,7 +21,7 @@ export class QuotesController {
 
   @Get(':id')
   @UsePipes(new ValidationPipe())
-  readSingleQuote(@Param('id') id) {
+  readSingleQuote(@Param('id') id: string) {
     return this.quotesService.show(id);
   }
 

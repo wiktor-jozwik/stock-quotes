@@ -79,7 +79,6 @@ export class QuotesService {
     }
     const quote = { ...data, company };
     try {
-      this.quoteRepository.create({ ...data, company });
       await this.quoteRepository.save(quote);
       await queryRunner.commitTransaction();
     } catch (error) {

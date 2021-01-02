@@ -54,7 +54,7 @@ export class CompaniesService {
     if (company) {
       throw new HttpException('Company already exists', HttpStatus.BAD_REQUEST);
     }
-    company = await this.companyRepository.create(data);
+    company = this.companyRepository.create(data);
     await this.companyRepository.save(company);
     return this.toResponseCompany(company);
   }
