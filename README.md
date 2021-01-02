@@ -83,7 +83,7 @@ Company:
   * post quote:
     * provide companyId, date and value and post on default path + /quotes
 * PUT
-  * provide body with fields to be changed and request on path like that, after default path insert /company/{id}
+  * provide body with fields to be changed and request on path like that, after default path insert /company/{symbol}
   ```
   localhost:3000/companies/c3a88fb3-e997-4269-b0d5-5617f2fdcd91
   ```

@@ -12,7 +12,9 @@ export class QuoteEntity {
 
   @Column('decimal') value: number;
 
-  @ManyToOne((type) => CompanyEntity, (company) => company.quotes)
+  @ManyToOne((type) => CompanyEntity, (company) => company.quotes, {
+    onDelete: 'CASCADE',
+  })
   company: CompanyEntity;
 
   toResponseQuote(): QuoteRO {

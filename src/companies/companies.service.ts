@@ -19,9 +19,13 @@ export class CompaniesService {
 
   private toResponseCompany(company: CompanyEntity): CompanyRO {
     const { id, name, symbol } = company;
-    const quotes = company.quotes.map((quote) => quote.toResponseQuote());
-    const toResponseObject = { id, name, symbol, quotes: quotes };
-    return toResponseObject;
+    if (company.quotes) {
+      const quotes = company.quotes.map((quote) => quote.toResponseQuote());
+      const toResponseObject = { id, name, symbol, quotes: quotes };
+      return toResponseObject;
+    } else {
+      return company;
+    }
   }
 
   async showAll(): Promise<CompanyRO[]> {
@@ -55,19 +59,19 @@ export class CompaniesService {
     return this.toResponseCompany(company);
   }
 
-  async update(id: string, data: Partial<CompanyDTO>): Promise<CompanyRO> {
+  async update(symbol: string, data: Partial<CompanyDTO>): Promise<CompanyRO> {
     const queryRunner = this.connection.createQueryRunner();
 
     await queryRunner.connect();
     await queryRunner.startTransaction('SERIALIZABLE');
-    let company = await this.companyRepository.findOne({ where: { id } });
+    let company = await this.companyRepository.findOne({ where: { symbol } });
     if (!company) {
       throw new HttpException('Company not found', HttpStatus.NOT_FOUND);
     }
     try {
-      await this.companyRepository.update({ id }, data);
+      await this.companyRepository.update({ symbol }, data);
       company = await this.companyRepository.findOne({
-        where: { id },
+        where: { symbol },
         relations: ['quotes'],
       });
       queryRunner.commitTransaction();
@@ -78,5 +82,30 @@ export class CompaniesService {
       await queryRunner.release();
     }
     return company;
+  }
+
+  async delete(symbol: string): Promise<CompanyRO> {
+    const queryRunner = this.connection.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction('SERIALIZABLE');
+
+    let company = await this.companyRepository.findOne({
+      where: { symbol },
+      relations: ['quotes'],
+    });
+    if (!company) {
+      throw new HttpException('Company not found', HttpStatus.NOT_FOUND);
+    }
+    try {
+      await this.companyRepository.delete({ symbol });
+      queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new InternalServerErrorException();
+    } finally {
+      await queryRunner.release();
+    }
+    return this.toResponseCompany(company);
   }
 }
