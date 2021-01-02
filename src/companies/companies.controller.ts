@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -19,8 +20,8 @@ export class CompaniesController {
     return this.companiesService.showAll();
   }
 
-  @Get(':id')
-  showOne(@Param('id') symbol: string) {
+  @Get(':symbol')
+  showOne(@Param('symbol') symbol: string) {
     return this.companiesService.show(symbol);
   }
 
@@ -30,9 +31,18 @@ export class CompaniesController {
     return this.companiesService.create(data);
   }
 
-  @Put(':id')
+  @Put(':symbol')
   @UsePipes(new ValidationPipe())
-  updateCompany(@Param('id') id: string, @Body() data: Partial<CompanyDTO>) {
-    return this.companiesService.update(id, data);
+  updateCompany(
+    @Param('symbol') symbol: string,
+    @Body() data: Partial<CompanyDTO>,
+  ) {
+    return this.companiesService.update(symbol, data);
+  }
+
+  @Delete(':symbol')
+  @UsePipes(new ValidationPipe())
+  deleteCompany(@Param('symbol') symbol: string) {
+    return this.companiesService.delete(symbol);
   }
 }

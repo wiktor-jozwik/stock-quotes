@@ -1,7 +1,11 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { QuoteEntity } from 'src/quotes/quote.entity';
-import { Repository } from 'typeorm';
+import { Connection, Repository } from 'typeorm';
 import { CompanyDTO, CompanyRO } from './company.dto';
 import { CompanyEntity } from './company.entity';
 
@@ -10,20 +14,25 @@ export class CompaniesService {
   constructor(
     @InjectRepository(CompanyEntity)
     private companyRepository: Repository<CompanyEntity>,
+    private connection: Connection,
   ) {}
 
-  private toResponseCompany(company: CompanyEntity): CompanyRO {
-    const { id, name, symbol } = company;
-    const quotes = company.quotes.map((quote) => quote.toResponseQuote());
-    const toResponseObject = { id, name, symbol, quotes: quotes };
-    return toResponseObject;
-  }
+  // private toResponseCompany(company: CompanyEntity): CompanyRO {
+  //   const { id, name, symbol } = company;
+  //   if (company.quotes) {
+  //     const quotes = company.quotes.map((quote) => quote.toResponseQuote());
+  //     const toResponseObject = { id, name, symbol, quotes: quotes };
+  //     return toResponseObject;
+  //   } else {
+  //     return company;
+  //   }
+  // }
 
   async showAll(): Promise<CompanyRO[]> {
     const companies = await this.companyRepository.find({
       relations: ['quotes'],
     });
-    return companies.map((company) => this.toResponseCompany(company));
+    return companies.map((company) => company.toResponseCompany());
   }
 
   async show(symbol: string): Promise<CompanyRO> {
@@ -34,7 +43,7 @@ export class CompaniesService {
     if (!company) {
       throw new HttpException('Company not found', HttpStatus.NOT_FOUND);
     }
-    return this.toResponseCompany(company);
+    return company.toResponseCompany();
   }
 
   async create(data: CompanyDTO): Promise<CompanyRO> {
@@ -45,21 +54,58 @@ export class CompaniesService {
     if (company) {
       throw new HttpException('Company already exists', HttpStatus.BAD_REQUEST);
     }
-    company = await this.companyRepository.create(data);
+    company = this.companyRepository.create(data);
     await this.companyRepository.save(company);
-    return this.toResponseCompany(company);
+    return company.toResponseCompany();
   }
 
-  async update(id: string, data: Partial<CompanyDTO>): Promise<CompanyRO> {
-    let company = await this.companyRepository.findOne({ where: { id } });
+  async update(symbol: string, data: Partial<CompanyDTO>): Promise<CompanyRO> {
+    const queryRunner = this.connection.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction('SERIALIZABLE');
+    let company = await this.companyRepository.findOne({ where: { symbol } });
     if (!company) {
       throw new HttpException('Company not found', HttpStatus.NOT_FOUND);
     }
-    await this.companyRepository.update({ id }, data);
-    company = await this.companyRepository.findOne({
-      where: { id },
+    try {
+      await this.companyRepository.update({ symbol }, data);
+      company = await this.companyRepository.findOne({
+        where: { symbol },
+        relations: ['quotes'],
+      });
+      queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new InternalServerErrorException();
+    } finally {
+      await queryRunner.release();
+    }
+    return company;
+  }
+
+  async delete(symbol: string): Promise<CompanyRO> {
+    const queryRunner = this.connection.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction('SERIALIZABLE');
+
+    let company = await this.companyRepository.findOne({
+      where: { symbol },
       relations: ['quotes'],
     });
-    return company;
+    if (!company) {
+      throw new HttpException('Company not found', HttpStatus.NOT_FOUND);
+    }
+    try {
+      await this.companyRepository.delete({ symbol });
+      queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new InternalServerErrorException();
+    } finally {
+      await queryRunner.release();
+    }
+    return company.toResponseCompany();
   }
 }
