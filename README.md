@@ -128,4 +128,4 @@ localhost:3000/graphql
     }
     ```
 
-It's possible to ommit some fields and get data which is needed 
+It's possible to omit some fields and get data which is needed 
