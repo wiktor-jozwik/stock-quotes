@@ -49,6 +49,8 @@ Default path to server:
 ```
 localhost:3000
 ```
+Port variable is stored in .env file
+
 ### Database
 Quote:
   ```ts
@@ -61,15 +63,15 @@ Company:
   ```ts
   id: uuid
   name: string
-  symbol: string
+  symbol: string(unique)
   ```
   
- ![alt text](https://github.com/wiktor-jozwik/stock-quotes/blob/develop/StockQuotes.png?raw=true)
+ ![database structure](https://github.com/wiktor-jozwik/stock-quotes/blob/master/StockQuotes.png?raw=true)
 
 
 ### Available requests
 * GET
-  * getting quote by ID - after default path insert /quotes/{id} i.e.
+  * getting quote by ID - after default path insert /quotes/{id}
   ```
   localhost:3000/quotes/c3a88fb3-e997-4269-b0d5-5617f2fdcd91
   ```
@@ -79,17 +81,19 @@ Company:
   ```
 * POST
   * post company:
-    * provide name and symbol and post on default path + /company
+    * provide name and symbol in body and post on default path + /company
   * post quote:
-    * provide companyId, date and value and post on default path + /quotes
+    * provide companyId, date and value in body and post on default path + /quotes
 * PUT
   * provide body with fields to be changed and request on path like that, after default path insert /company/{symbol}
   ```
-  localhost:3000/companies/c3a88fb3-e997-4269-b0d5-5617f2fdcd91
+  localhost:3000/companies/AAPL
+
   ```
 
 * DELETE
-  * provide ID of quote which have to be deleted in the same way as getting quote by ID
+  * delete quote by providing ID of quote which have to be deleted in the same way as getting quote by ID
+  * delete company by providing symbol of company which have to be deleted in the same way as getting company by symbol
 
 ### GraphQL
 ```
@@ -117,6 +121,9 @@ localhost:3000/graphql
           id
           date
           value
+          company{
+            ...
+          }
         }
     }
     ```

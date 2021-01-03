@@ -17,17 +17,6 @@ export class CompaniesService {
     private connection: Connection,
   ) {}
 
-  // private toResponseCompany(company: CompanyEntity): CompanyRO {
-  //   const { id, name, symbol } = company;
-  //   if (company.quotes) {
-  //     const quotes = company.quotes.map((quote) => quote.toResponseQuote());
-  //     const toResponseObject = { id, name, symbol, quotes: quotes };
-  //     return toResponseObject;
-  //   } else {
-  //     return company;
-  //   }
-  // }
-
   async showAll(): Promise<CompanyRO[]> {
     const companies = await this.companyRepository.find({
       relations: ['quotes'],
