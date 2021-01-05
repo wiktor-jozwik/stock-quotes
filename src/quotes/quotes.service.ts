@@ -37,6 +37,7 @@ export class QuotesService {
       throw new InternalServerErrorException();
     } finally {
       await queryRunner.release();
+      console.log('Test');
     }
     return quotes.map((quote) => quote.toResponseQuote());
   }
