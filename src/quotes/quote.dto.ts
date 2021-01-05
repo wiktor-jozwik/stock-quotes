@@ -2,7 +2,7 @@ import { IsNumber, IsString } from 'class-validator';
 import { CompanyEntity } from '../companies/company.entity';
 export class QuoteDTO {
   @IsString()
-  companyId: string;
+  symbol: string;
   @IsString()
   date: string;
   @IsNumber()

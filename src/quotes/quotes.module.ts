@@ -5,10 +5,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { QuoteEntity } from './quote.entity';
 import { CompanyEntity } from '../companies/company.entity';
 import { QuotesResolver } from './quotes.resolver';
+import { CompaniesService } from 'src/companies/companies.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([QuoteEntity, CompanyEntity])],
-  providers: [QuotesService, QuotesResolver],
+  providers: [QuotesService, QuotesResolver, CompaniesService],
   controllers: [QuotesController],
 })
 export class QuotesModule {}

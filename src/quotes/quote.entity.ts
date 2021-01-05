@@ -13,7 +13,7 @@ import { QuoteRO } from './quote.dto';
 export class QuoteEntity {
   @PrimaryGeneratedColumn('uuid') id: string;
 
-  @Column('uuid') companyId: string;
+  @Column('text') symbol: string;
 
   @Index('quote_date_index')
   @Column('text')

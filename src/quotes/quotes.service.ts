@@ -9,6 +9,7 @@ import { CompanyEntity } from '../companies/company.entity';
 import { Connection, Repository } from 'typeorm';
 import { QuoteDTO, QuoteRO } from './quote.dto';
 import { QuoteEntity } from './quote.entity';
+import { CompaniesService } from 'src/companies/companies.service';
 
 @Injectable()
 export class QuotesService {
@@ -17,6 +18,7 @@ export class QuotesService {
     private quoteRepository: Repository<QuoteEntity>,
     @InjectRepository(CompanyEntity)
     private companyRepository: Repository<CompanyEntity>,
+    private companiesService: CompaniesService,
     private connection: Connection,
   ) {}
 
@@ -37,7 +39,6 @@ export class QuotesService {
       throw new InternalServerErrorException();
     } finally {
       await queryRunner.release();
-      console.log('Test');
     }
     return quotes.map((quote) => quote.toResponseQuote());
   }
@@ -72,12 +73,17 @@ export class QuotesService {
     await queryRunner.connect();
     await queryRunner.startTransaction('READ COMMITTED');
 
-    const company = await this.companyRepository.findOne({
-      where: { id: data.companyId },
+    let company = await this.companyRepository.findOne({
+      where: { symbol: data.symbol },
     });
     if (!company) {
-      throw new HttpException('Company not found', HttpStatus.NOT_FOUND);
+      const { symbol } = data;
+      // throw new HttpException('Company not found', HttpStatus.NOT_FOUND);
+      this.companiesService.create({ symbol });
     }
+    company = await this.companyRepository.findOne({
+      where: { symbol: data.symbol },
+    });
     const quote = { ...data, company };
     try {
       await this.quoteRepository.save(quote);
