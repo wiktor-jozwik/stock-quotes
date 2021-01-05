@@ -10,7 +10,7 @@ import { Connection, Repository } from 'typeorm';
 import { QuoteDTO, QuoteRO } from './quote.dto';
 import { QuoteEntity } from './quote.entity';
 import { CompaniesService } from 'src/companies/companies.service';
-import { CompanyDTO } from 'src/companies/company.dto';
+import { CompanyRO } from 'src/companies/company.dto';
 
 @Injectable()
 export class QuotesService {
@@ -74,7 +74,7 @@ export class QuotesService {
     await queryRunner.connect();
     await queryRunner.startTransaction('SERIALIZABLE');
 
-    let company: CompanyEntity;
+    let company: CompanyRO;
     let quote: QuoteRO;
 
     try {
@@ -91,12 +91,12 @@ export class QuotesService {
         }
         const createFromQuote = true;
         const { symbol, name } = data;
-        await this.companiesService.create({ symbol, name }, createFromQuote);
+        company = await this.companiesService.create(
+          { symbol, name },
+          createFromQuote,
+        );
       }
 
-      company = await this.companyRepository.findOne({
-        where: { symbol: data.symbol },
-      });
       quote = { ...data, company };
       await this.quoteRepository.save(quote);
 
