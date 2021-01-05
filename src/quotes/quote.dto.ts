@@ -4,13 +4,15 @@ export class QuoteDTO {
   @IsString()
   symbol: string;
   @IsString()
+  name: string;
+  @IsString()
   date: string;
   @IsNumber()
   value: number;
 }
 
 export class QuoteRO {
-  id: string;
+  id?: string;
   date: string;
   value: number;
   company: CompanyEntity;

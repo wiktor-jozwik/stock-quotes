@@ -35,16 +35,43 @@ export class CompaniesService {
     return company.toResponseCompany();
   }
 
-  async create(data: CompanyDTO): Promise<CompanyRO> {
-    const { symbol } = data;
-    let company = await this.companyRepository.findOne({
-      where: { symbol },
-    });
-    if (company) {
-      throw new HttpException('Company already exists', HttpStatus.BAD_REQUEST);
+  async create(data: CompanyDTO, fromQuote = false): Promise<CompanyRO> {
+    let company: CompanyEntity;
+    if (fromQuote) {
+      const { symbol } = data;
+      company = await this.companyRepository.findOne({
+        where: { symbol },
+      });
+      company = this.companyRepository.create(data);
+      await this.companyRepository.save(company);
+    } else {
+      let queryRunner = this.connection.createQueryRunner();
+
+      await queryRunner.connect();
+      await queryRunner.startTransaction('SERIALIZABLE');
+
+      const { symbol } = data;
+      company = await this.companyRepository.findOne({
+        where: { symbol },
+      });
+      if (company) {
+        throw new HttpException(
+          'Company already exists',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      try {
+        company = this.companyRepository.create(data);
+        await this.companyRepository.save(company);
+        queryRunner.commitTransaction();
+      } catch (error) {
+        await queryRunner.rollbackTransaction();
+        throw new InternalServerErrorException();
+      } finally {
+        await queryRunner.release();
+      }
     }
-    company = this.companyRepository.create(data);
-    await this.companyRepository.save(company);
+
     return company.toResponseCompany();
   }
 
@@ -57,12 +84,19 @@ export class CompaniesService {
     if (!company) {
       throw new HttpException('Company not found', HttpStatus.NOT_FOUND);
     }
+
     try {
       await this.companyRepository.update({ symbol }, data);
+
+      // If symbol is being changed
+      if (data.symbol) {
+        symbol = data.symbol;
+      }
       company = await this.companyRepository.findOne({
         where: { symbol },
         relations: ['quotes'],
       });
+
       queryRunner.commitTransaction();
     } catch (error) {
       await queryRunner.rollbackTransaction();
@@ -70,7 +104,7 @@ export class CompaniesService {
     } finally {
       await queryRunner.release();
     }
-    return company;
+    return company.toResponseCompany();
   }
 
   async delete(symbol: string): Promise<CompanyRO> {
