@@ -75,20 +75,27 @@ Company:
   ```
   localhost:3000/quotes/c3a88fb3-e997-4269-b0d5-5617f2fdcd91
   ```
+  * getting all quotes
+  ```
+  localhost:3000/quotes
+  ```
   * getting company by name, after default path: /companies/{symbol}
   ```
   localhost:3000/companies/AAPL
+  ```
+  * getting all companies
+  ```
+  localhost:3000/companies
   ```
 * POST
   * post company:
     * provide name and symbol in body and post on default path + /company
   * post quote:
-    * provide companyId, date and value in body and post on default path + /quotes
+    * provide symbol and name of company, date and value of quote in body and post on default path + /quotes(If company will be created if does not exist)
 * PUT
   * provide body with fields to be changed and request on path like that, after default path insert /company/{symbol}
   ```
   localhost:3000/companies/AAPL
-
   ```
 
 * DELETE
