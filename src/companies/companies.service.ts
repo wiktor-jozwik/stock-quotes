@@ -88,7 +88,7 @@ export class CompaniesService {
     try {
       await this.companyRepository.update({ symbol }, data);
 
-      // If symbol is being changed
+      // If symbol is changed
       if (data.symbol) {
         symbol = data.symbol;
       }

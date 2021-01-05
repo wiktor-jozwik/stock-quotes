@@ -68,7 +68,7 @@ export class QuotesService {
     return quote.toResponseQuote();
   }
 
-  async create(data: QuoteDTO): Promise<any> {
+  async create(data: QuoteDTO): Promise<QuoteRO> {
     let queryRunner = this.connection.createQueryRunner();
 
     await queryRunner.connect();
@@ -83,8 +83,15 @@ export class QuotesService {
       });
 
       if (!company) {
+        if (!data.name) {
+          throw new HttpException(
+            'Company does not exist, to create company you should provide also its name',
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+        const createFromQuote = true;
         const { symbol, name } = data;
-        await this.companiesService.create({ symbol, name }, true);
+        await this.companiesService.create({ symbol, name }, createFromQuote);
       }
 
       company = await this.companyRepository.findOne({
@@ -96,7 +103,7 @@ export class QuotesService {
       await queryRunner.commitTransaction();
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      throw new InternalServerErrorException();
+      throw new HttpException(error.response, error.status);
     } finally {
       await queryRunner.release();
     }
