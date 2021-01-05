@@ -1,5 +1,5 @@
 import { IsNotEmpty } from 'class-validator';
-import { QuoteRO } from 'src/quotes/quote.dto';
+import { QuoteRO } from '../quotes/quote.dto';
 
 export class CompanyDTO {
   @IsNotEmpty()

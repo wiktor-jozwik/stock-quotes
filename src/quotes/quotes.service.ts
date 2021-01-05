@@ -5,7 +5,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CompanyEntity } from 'src/companies/company.entity';
+import { CompanyEntity } from '../companies/company.entity';
 import { Connection, Repository } from 'typeorm';
 import { QuoteDTO, QuoteRO } from './quote.dto';
 import { QuoteEntity } from './quote.entity';

@@ -7,7 +7,7 @@ import {
   Post,
   UsePipes,
 } from '@nestjs/common';
-import { ValidationPipe } from 'src/shared/validation.pipe';
+import { ValidationPipe } from '../shared/validation.pipe';
 import { QuoteDTO } from './quote.dto';
 import { QuotesService } from './quotes.service';
 

@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { CompaniesService } from './companies.service';
 import { CompanyDTO } from './company.dto';
-import { ValidationPipe } from 'src/shared/validation.pipe';
+import { ValidationPipe } from '../shared/validation.pipe';
 
 @Controller('companies')
 export class CompaniesController {

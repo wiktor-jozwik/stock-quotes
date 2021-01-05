@@ -1,4 +1,4 @@
-import { QuoteEntity } from 'src/quotes/quote.entity';
+import { QuoteEntity } from '../quotes/quote.entity';
 import {
   Column,
   Entity,

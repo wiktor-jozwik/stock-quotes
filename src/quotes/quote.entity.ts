@@ -1,4 +1,4 @@
-import { CompanyEntity } from 'src/companies/company.entity';
+import { CompanyEntity } from '../companies/company.entity';
 import {
   Column,
   Entity,
