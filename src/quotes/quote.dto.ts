@@ -6,6 +6,7 @@ export class QuoteDTO {
   symbol: string;
 
   name: string;
+
   @IsString()
   date: string;
 
