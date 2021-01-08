@@ -1,18 +1,135 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CompaniesController } from './companies.controller';
+import { CompaniesService } from './companies.service';
+import { CompanyDTO } from './company.dto';
+
+const nameTest = 'Name Test';
+const quoteTest = {
+  id: 'a uuid',
+  date: '14.01.2021',
+  value: 155.54,
+};
 
 describe('CompaniesController', () => {
-  let controller: CompaniesController;
+  let companiesController: CompaniesController;
+  let companiesService: CompaniesService;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
+    const moduleRef: TestingModule = await Test.createTestingModule({
+      providers: [
+        CompaniesService,
+        {
+          provide: CompaniesService,
+          useValue: {
+            showAll: jest.fn().mockResolvedValue([
+              {
+                symbol: 'AAPL',
+                name: 'Apple',
+                quotes: [quoteTest],
+              },
+              { symbol: 'CDR', name: 'CDRProjekt' },
+              { symbol: 'AMZN', name: 'Amazon' },
+            ]),
+            show: jest.fn().mockImplementation((symbol: string) =>
+              Promise.resolve({
+                symbol,
+                name: nameTest,
+                quotes: [quoteTest],
+              }),
+            ),
+            create: jest
+              .fn()
+              .mockImplementation((company: CompanyDTO) =>
+                Promise.resolve({ id: 'a uuid', ...company }),
+              ),
+            update: jest
+              .fn()
+              .mockImplementation((symbol: string, data: Partial<CompanyDTO>) =>
+                Promise.resolve({ id: 'a uuid', ...data }),
+              ),
+            delete: jest.fn().mockImplementation((symbol: string) =>
+              Promise.resolve({
+                symbol,
+                name: nameTest,
+                quotes: [quoteTest],
+              }),
+            ),
+          },
+        },
+      ],
       controllers: [CompaniesController],
     }).compile();
 
-    controller = module.get<CompaniesController>(CompaniesController);
+    companiesService = moduleRef.get<CompaniesService>(CompaniesService);
+    companiesController = moduleRef.get<CompaniesController>(
+      CompaniesController,
+    );
   });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
+  describe('showAllCompanies', () => {
+    it('should get an array of companies', async () => {
+      await expect(companiesController.showAllCompanies()).resolves.toEqual([
+        {
+          symbol: 'AAPL',
+          name: 'Apple',
+          quotes: [quoteTest],
+        },
+        { symbol: 'CDR', name: 'CDRProjekt' },
+        { symbol: 'AMZN', name: 'Amazon' },
+      ]);
+    });
+  });
+
+  describe('showOne', () => {
+    it('should get a company', async () => {
+      const getSymbol = 'AAPL';
+      await expect(companiesController.showOne(getSymbol)).resolves.toEqual({
+        name: nameTest,
+        symbol: getSymbol,
+        quotes: [quoteTest],
+      });
+    });
+  });
+
+  describe('createCompany', () => {
+    it('should create a company', async () => {
+      const newCompany: CompanyDTO = {
+        name: 'Apple',
+        symbol: 'AAPL',
+      };
+      await expect(
+        companiesController.createCompany(newCompany),
+      ).resolves.toEqual({
+        id: 'a uuid',
+        ...newCompany,
+      });
+    });
+  });
+
+  describe('updateCompany', () => {
+    it('should update a company', async () => {
+      const postSymbol = 'AAPL';
+      const newCompany: Partial<CompanyDTO> = {
+        name: 'App',
+        symbol: 'AAP',
+      };
+      await expect(
+        companiesController.updateCompany(postSymbol, newCompany),
+      ).resolves.toEqual({
+        id: 'a uuid',
+        ...newCompany,
+      });
+    });
+  });
+
+  describe('deleteCompany', () => {
+    it('should delete a company', async () => {
+      const symbol = 'AAPL';
+      await expect(companiesController.deleteCompany(symbol)).resolves.toEqual({
+        name: nameTest,
+        symbol: symbol,
+        quotes: [quoteTest],
+      });
+    });
   });
 });
