@@ -17,7 +17,6 @@ describe('CompaniesController', () => {
   beforeEach(async () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
       providers: [
-        CompaniesService,
         {
           provide: CompaniesService,
           useValue: {
@@ -82,10 +81,10 @@ describe('CompaniesController', () => {
 
   describe('showOne', () => {
     it('should get a company', async () => {
-      const getSymbol = 'AAPL';
-      await expect(companiesController.showOne(getSymbol)).resolves.toEqual({
+      const symbol = 'AAPL';
+      await expect(companiesController.showOne(symbol)).resolves.toEqual({
         name: nameTest,
-        symbol: getSymbol,
+        symbol: symbol,
         quotes: [quoteTest],
       });
     });
