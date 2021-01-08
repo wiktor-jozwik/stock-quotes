@@ -116,7 +116,10 @@ export class QuotesService {
 
     await queryRunner.connect();
     await queryRunner.startTransaction('SERIALIZABLE');
-    const quote = await this.quoteRepository.findOne({ where: { id } });
+    const quote = await this.quoteRepository.findOne({
+      where: { id },
+      relations: ['company'],
+    });
     if (!quote) {
       throw new HttpException('Quote not found', HttpStatus.NOT_FOUND);
     }
