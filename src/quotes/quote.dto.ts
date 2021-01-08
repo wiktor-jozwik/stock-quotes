@@ -1,5 +1,5 @@
 import { IsNumber, IsString } from 'class-validator';
-import { CompanyRO } from 'src/companies/company.dto';
+import { CompanyRO } from '../companies/company.dto';
 
 export class QuoteDTO {
   @IsString()

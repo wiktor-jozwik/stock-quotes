@@ -9,8 +9,8 @@ import { CompanyEntity } from '../companies/company.entity';
 import { Connection, Repository } from 'typeorm';
 import { QuoteDTO, QuoteRO } from './quote.dto';
 import { QuoteEntity } from './quote.entity';
-import { CompaniesService } from 'src/companies/companies.service';
-import { CompanyRO } from 'src/companies/company.dto';
+import { CompaniesService } from '../companies/companies.service';
+import { CompanyRO } from '../companies/company.dto';
 
 @Injectable()
 export class QuotesService {
